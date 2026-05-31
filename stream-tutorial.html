@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Stream Conversion Tutorial</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .tutorial-shell {
+      width: min(100vw - 24px, 1320px);
+      margin: 0 auto;
+      padding: 18px 0 40px;
+    }
+
+    .tutorial-hero,
+    .tutorial-card {
+      background: rgba(17, 23, 34, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+    }
+
+    .tutorial-hero {
+      position: relative;
+      overflow: hidden;
+      padding: 22px;
+      margin-bottom: 14px;
+      background:
+        radial-gradient(circle at 12% 15%, rgba(34, 197, 94, 0.22), transparent 28%),
+        radial-gradient(circle at 82% 8%, rgba(59, 130, 246, 0.18), transparent 30%),
+        linear-gradient(135deg, rgba(17, 23, 34, 0.98), rgba(8, 13, 20, 0.96));
+    }
+
+    .tutorial-hero::after {
+      content: "stream()";
+      position: absolute;
+      right: 28px;
+      bottom: 18px;
+      color: rgba(148, 163, 184, 0.08);
+      font-family: "Cascadia Code", Consolas, monospace;
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 900;
+      pointer-events: none;
+    }
+
+    .tutorial-hero h1 {
+      max-width: none;
+      margin-bottom: 12px;
+    }
+
+    .tutorial-hero p {
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 86ch;
+    }
+
+    .tutorial-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .tutorial-nav a {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px 11px;
+      color: var(--ink);
+      background: #0a0f17;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .tutorial-nav a:hover {
+      color: var(--accent);
+      border-color: rgba(34, 197, 94, 0.58);
+      transform: translateY(-1px);
+    }
+
+    .tutorial-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .tutorial-card {
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+      border-color: var(--card-border, var(--card-accent, #22c55e));
+      background:
+        radial-gradient(circle at 0 0, var(--card-glow, rgba(34, 197, 94, 0.2)), transparent 34%),
+        linear-gradient(180deg, rgba(17, 23, 34, 0.98), rgba(10, 15, 23, 0.96));
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    }
+
+    .tutorial-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 4px;
+      background: linear-gradient(90deg, var(--card-accent, #22c55e), transparent);
+    }
+
+    .tutorial-card::after {
+      content: attr(data-kind);
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      border: 1px solid var(--card-border, var(--card-accent, #22c55e));
+      border-radius: 999px;
+      padding: 4px 9px;
+      color: var(--card-accent, #22c55e);
+      background: rgba(8, 13, 20, 0.72);
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    .tutorial-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 22px 52px rgba(0, 0, 0, 0.34);
+    }
+
+    .tutorial-card:nth-child(6n + 1) { --card-accent: #22c55e; --card-border: rgba(34, 197, 94, 0.78); --card-glow: rgba(34, 197, 94, 0.2); }
+    .tutorial-card:nth-child(6n + 2) { --card-accent: #3b82f6; --card-border: rgba(59, 130, 246, 0.78); --card-glow: rgba(59, 130, 246, 0.2); }
+    .tutorial-card:nth-child(6n + 3) { --card-accent: #f59e0b; --card-border: rgba(245, 158, 11, 0.78); --card-glow: rgba(245, 158, 11, 0.2); }
+    .tutorial-card:nth-child(6n + 4) { --card-accent: #ef4444; --card-border: rgba(239, 68, 68, 0.78); --card-glow: rgba(239, 68, 68, 0.2); }
+    .tutorial-card:nth-child(6n + 5) { --card-accent: #a855f7; --card-border: rgba(168, 85, 247, 0.78); --card-glow: rgba(168, 85, 247, 0.2); }
+    .tutorial-card:nth-child(6n) { --card-accent: #14b8a6; --card-border: rgba(20, 184, 166, 0.78); --card-glow: rgba(20, 184, 166, 0.2); }
+
+    .tutorial-card h2 {
+      color: var(--card-accent, var(--ink));
+      padding-right: 96px;
+    }
+
+    .tutorial-card h2 {
+      margin-bottom: 8px;
+    }
+
+    .tutorial-card p {
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+
+    .tutorial-card pre {
+      margin: 0;
+      overflow: auto;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 6px;
+      padding: 14px;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        #060a11;
+      background-size: 38px 100%;
+      color: var(--ink);
+      line-height: 1.45;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .wide {
+      grid-column: 1 / -1;
+    }
+
+    @media (max-width: 820px) {
+      .tutorial-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="tutorial-shell">
+    <section class="tutorial-hero">
+      <p class="eyebrow">Stream API Tutorial</p>
+      <h1>Convert Java Data Types To Streams</h1>
+      <p>
+        A stream is a pipeline over data. If the data type already owns elements, like a
+        <code>List</code> or <code>Set</code>, call <code>.stream()</code>. If the data is not a
+        collection object, like an array, string, file, iterator, or nullable value, use a helper
+        such as <code>Arrays.stream(...)</code>, <code>Stream.of(...)</code>, <code>Files.lines(...)</code>,
+        or <code>StreamSupport.stream(...)</code>.
+      </p>
+      <nav class="tutorial-nav" aria-label="Tutorial sections">
+        <a href="index.html">Back to Practice</a>
+        <a href="#collections">Collections</a>
+        <a href="#arrays">Arrays</a>
+        <a href="#maps">Maps</a>
+        <a href="#strings">Strings</a>
+        <a href="#objects">Objects</a>
+        <a href="#files">Files</a>
+        <a href="#special">Special Types</a>
+      </nav>
+    </section>
+
+    <section class="tutorial-grid">
+      <article class="tutorial-card wide" id="why" data-kind="Concept">
+        <h2>Why sometimes <code>.stream()</code> and sometimes <code>Stream.of(...)</code>?</h2>
+        <p>
+          Use <code>data.stream()</code> when the object implements <code>Collection</code>, such as
+          <code>List</code>, <code>Set</code>, or <code>Queue</code>. Use utility methods when the
+          value itself does not have a stream method.
+        </p>
+        <pre><code>// Collection owns stream()
+employees.stream()
+
+// Array does not have stream()
+Arrays.stream(numbers)
+
+// Individual values become a stream
+Stream.of("IT", "HR", "Finance")
+
+// One nullable object becomes 0 or 1 stream item
+Stream.ofNullable(employee)</code></pre>
+      </article>
+
+      <article class="tutorial-card" id="collections" data-kind="Collection">
+        <h2>List / ArrayList / LinkedList</h2>
+        <p>All lists implement <code>Collection</code>, so use <code>.stream()</code>.</p>
+        <pre><code>List&lt;Employee&gt; employees = new ArrayList&lt;&gt;();
+
+List&lt;String&gt; names = employees.stream()
+    .map(Employee::getName)
+    .collect(Collectors.toList());</code></pre>
+      </article>
+
+      <article class="tutorial-card" data-kind="Collection">
+        <h2>Set / HashSet / TreeSet</h2>
+        <p>Sets also implement <code>Collection</code>. Stream order depends on the set type.</p>
+        <pre><code>Set&lt;String&gt; departments = Set.of("IT", "HR", "Finance");
+
+departments.stream()
+    .filter(d -&gt; d.length() &gt; 2)
+    .forEach(System.out::println);</code></pre>
+      </article>
+
+      <article class="tutorial-card" data-kind="Collection">
+        <h2>Queue / Deque</h2>
+        <p>Queues are collections too. Use stream when you want processing without removing items.</p>
+        <pre><code>Queue&lt;Integer&gt; queue = new ArrayDeque&lt;&gt;();
+
+int total = queue.stream()
+    .mapToInt(Integer::intValue)
+    .sum();</code></pre>
+      </article>
+
+      <article class="tutorial-card" id="arrays" data-kind="Array">
+        <h2>Object Array</h2>
+        <p>Arrays do not have <code>.stream()</code>. Use <code>Arrays.stream(array)</code>.</p>
+        <pre><code>Employee[] employeeArray = {
+    new Employee(101, "John", "IT", 70000)
+};
+
+Arrays.stream(employeeArray)
+    .map(Employee::getName)
+    .forEach(System.out::println);</code></pre>
+      </article>
+
+      <article class="tutorial-card" data-kind="Primitive">
+        <h2>Primitive Arrays</h2>
+        <p>Primitive arrays become primitive streams: <code>IntStream</code>, <code>LongStream</code>, or <code>DoubleStream</code>.</p>
+        <pre><code>int[] salaries = {70000, 50000, 90000};
+
+int max = Arrays.stream(salaries)
+    .max()
+    .orElse(0);</code></pre>
+      </article>
+
+      <article class="tutorial-card" data-kind="Values">
+        <h2>Varargs / Fixed Values</h2>
+        <p>Use <code>Stream.of(...)</code> when values are listed directly.</p>
+        <pre><code>Stream.of("John", "Alice", "Bob")
+    .map(String::toUpperCase)
+    .forEach(System.out::println);</code></pre>
+      </article>
+
+      <article class="tutorial-card" id="maps" data-kind="Map">
+        <h2>HashMap / LinkedHashMap</h2>
+        <p>A map is not a collection of values directly. Stream entries, keys, or values.</p>
+        <pre><code>Map&lt;String, Integer&gt; deptCount = new HashMap&lt;&gt;();
+
+deptCount.entrySet().stream()
+    .filter(e -&gt; e.getValue() &gt; 1)
+    .forEach(System.out::println);</code></pre>
+      </article>
+
+      <article class="tutorial-card" data-kind="Map">
+        <h2>Map Keys / Values</h2>
+        <p>Use <code>keySet()</code> for keys and <code>values()</code> for values.</p>
+        <pre><code>map.keySet().stream()
+    .forEach(System.out::println);
+
+map.values().stream()
+    .forEach(System.out::println);</code></pre>
+      </article>
+
+      <article class="tutorial-card" id="strings" data-kind="String">
+        <h2>String Characters</h2>
+        <p><code>chars()</code> creates an <code>IntStream</code> of character codes.</p>
+        <pre><code>String name = "Stream";
+
+name.chars()
+    .mapToObj(c -&gt; (char) c)
+    .forEach(System.out::println);</code></pre>
+      </article>
+
+      <article class="tutorial-card" data-kind="String">
+        <h2>String Words</h2>
+        <p>Split the string, then stream the array.</p>
+        <pre><code>String sentence = "Java stream api practice";
+
+Arrays.stream(sentence.split("\\s+"))
+    .filter(word -&gt; word.length() &gt; 4)
+    .forEach(System.out::println);</code></pre>
+      </article>
+
+      <article class="tutorial-card" id="objects" data-kind="Object">
+        <h2>Single Object</h2>
+        <p>Use <code>Stream.of(object)</code> for one non-null object.</p>
+        <pre><code>Employee employee = new Employee(101, "John", "IT", 70000);
+
+Stream.of(employee)
+    .map(Employee::getName)
+    .forEach(System.out::println);</code></pre>
+      </article>
+
+      <article class="tutorial-card" data-kind="Nullable">
+        <h2>Nullable Object</h2>
+        <p>Use <code>Stream.ofNullable(...)</code> so null becomes an empty stream.</p>
+        <pre><code>Employee employee = findEmployee();
+
+Stream.ofNullable(employee)
+    .map(Employee::getName)
+    .forEach(System.out::println);</code></pre>
+      </article>
+
+      <article class="tutorial-card" data-kind="Optional">
+        <h2>Optional</h2>
+        <p>Java 9+ has <code>optional.stream()</code>, useful for flattening optionals.</p>
+        <pre><code>Optional&lt;Employee&gt; optional = findById(101);
+
+optional.stream()
+    .map(Employee::getDepartment)
+    .forEach(System.out::println);</code></pre>
+      </article>
+
+      <article class="tutorial-card" data-kind="flatMap">
+        <h2>Nested List</h2>
+        <p>Use <code>flatMap</code> to convert nested streams into one stream.</p>
+        <pre><code>List&lt;List&lt;String&gt;&gt; skills = List.of(
+    List.of("Java", "SQL"),
+    List.of("Spring", "Java")
+);
+
+List&lt;String&gt; flat = skills.stream()
+    .flatMap(List::stream)
+    .distinct()
+    .collect(Collectors.toList());</code></pre>
+      </article>
+
+      <article class="tutorial-card" id="files" data-kind="File">
+        <h2>File Lines</h2>
+        <p>Use <code>Files.lines(path)</code>. Close it with try-with-resources.</p>
+        <pre><code>Path path = Paths.get("employees.txt");
+
+try (Stream&lt;String&gt; lines = Files.lines(path)) {
+    lines.filter(line -&gt; line.contains("IT"))
+         .forEach(System.out::println);
+}</code></pre>
+      </article>
+
+      <article class="tutorial-card" id="special" data-kind="Iterable">
+        <h2>Iterator / Iterable</h2>
+        <p>Use <code>StreamSupport.stream(...)</code> when an object is iterable but not a collection.</p>
+        <pre><code>Iterable&lt;Employee&gt; iterable = getEmployees();
+
+Stream&lt;Employee&gt; stream = StreamSupport.stream(
+    iterable.spliterator(),
+    false
+);</code></pre>
+      </article>
+
+      <article class="tutorial-card" data-kind="Generate">
+        <h2>Generate / Iterate</h2>
+        <p>Create streams without existing data using <code>generate</code> or <code>iterate</code>.</p>
+        <pre><code>Stream.generate(Math::random)
+    .limit(5)
+    .forEach(System.out::println);
+
+IntStream.iterate(1, n -&gt; n + 1)
+    .limit(10)
+    .forEach(System.out::println);</code></pre>
+      </article>
+
+      <article class="tutorial-card" data-kind="Range">
+        <h2>Primitive Ranges</h2>
+        <p>Use range streams when you need indexes or numbers.</p>
+        <pre><code>IntStream.range(0, employees.size())
+    .mapToObj(i -&gt; (i + 1) + ". " + employees.get(i).getName())
+    .forEach(System.out::println);</code></pre>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
+

@@ -121,6 +121,31 @@ h2 {
   color: var(--accent);
 }
 
+.hamburger-btn,
+.drawer-backdrop {
+  display: none;
+}
+
+.hamburger-btn {
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #0a0f17;
+  cursor: pointer;
+}
+
+.hamburger-btn span {
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--ink);
+}
+
 .scoreboard span {
   display: block;
   font-size: 1.5rem;
@@ -460,29 +485,58 @@ textarea {
 }
 
 @media (max-width: 900px) {
+  body.question-drawer-open {
+    overflow: hidden;
+  }
+
   .layout,
   .comparison-panel {
     grid-template-columns: 1fr;
   }
 
+  .hamburger-btn {
+    display: inline-flex;
+  }
+
   .question-list {
-    height: auto;
+    width: min(86vw, 340px);
+    height: 100vh;
     min-height: 0;
-    position: static;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 80;
+    border-radius: 0 8px 8px 0;
+    transform: translateX(-105%);
+    transition: transform 220ms ease;
+  }
+
+  body.question-drawer-open .question-list {
+    transform: translateX(0);
+  }
+
+  .drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    border: 0;
+    background: rgba(0, 0, 0, 0.56);
+    cursor: pointer;
+  }
+
+  body.question-drawer-open .drawer-backdrop {
+    display: block;
   }
 
   .question-buttons {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(74px, 1fr));
-    max-height: 220px;
-  }
-
-  .question-pill {
-    justify-content: center;
+    display: block;
+    height: calc(100% - 119px);
+    max-height: none;
+    overflow: auto;
   }
 
   .question-pill span:last-child {
-    display: none;
+    display: inline;
   }
 
   .compiler-frame {
@@ -492,9 +546,66 @@ textarea {
 }
 
 @media (max-width: 560px) {
-  .topbar,
-  .progress-tools,
-  .topnav,
+  .app-shell {
+    width: min(100vw - 12px, 1880px);
+    padding-top: 6px;
+  }
+
+  .topbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  h1 {
+    font-size: 1.65rem;
+  }
+
+  .title-block {
+    min-width: 0;
+  }
+
+  .progress-tools {
+    grid-column: 1 / -1;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topnav {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .topnav a,
+  #clearProgress {
+    min-height: 36px;
+    padding: 8px 11px;
+    font-size: 0.9rem;
+  }
+
+  #clearProgress {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .scoreboard {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    min-width: 76px;
+    padding: 8px 10px;
+  }
+
+  .scoreboard span {
+    font-size: 1.25rem;
+  }
+
   .compiler-frame-head,
   .compiler-tools {
     align-items: flex-start;

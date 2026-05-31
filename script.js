@@ -77,6 +77,8 @@ const nodes = {
   codeEditor: document.querySelector("#codeEditor"),
   compilerOutput: document.querySelector("#compilerOutput"),
   compilerFrame: document.querySelector("#oneCompilerFrame"),
+  menuToggle: document.querySelector("#menuToggle"),
+  drawerBackdrop: document.querySelector("#drawerBackdrop"),
   streamWarning: document.querySelector("#streamWarning"),
   comparisonPanel: document.querySelector("#comparisonPanel"),
   comparisonExpected: document.querySelector("#comparisonExpected"),
@@ -227,6 +229,7 @@ function renderQuestionList() {
     button.addEventListener("click", () => {
       state.index = questions.findIndex((item) => item.id === question.id);
       render();
+      closeQuestionDrawer();
     });
     nodes.questionButtons.appendChild(button);
   });
@@ -234,6 +237,16 @@ function renderQuestionList() {
 
 function currentQuestion() {
   return questions[state.index];
+}
+
+function closeQuestionDrawer() {
+  document.body.classList.remove("question-drawer-open");
+  nodes.menuToggle.setAttribute("aria-expanded", "false");
+}
+
+function toggleQuestionDrawer() {
+  const isOpen = document.body.classList.toggle("question-drawer-open");
+  nodes.menuToggle.setAttribute("aria-expanded", String(isOpen));
 }
 
 function render() {
@@ -474,6 +487,8 @@ function sparkle() {
 }
 
 document.querySelector("#submitBtn").addEventListener("click", runAndSubmit);
+nodes.menuToggle.addEventListener("click", toggleQuestionDrawer);
+nodes.drawerBackdrop.addEventListener("click", closeQuestionDrawer);
 document.querySelector("#resetCode").addEventListener("click", () => {
   nodes.codeEditor.value = starterCode(currentQuestion());
   nodes.compilerOutput.value = "";
@@ -495,6 +510,11 @@ document.querySelector("#prevBtn").addEventListener("click", () => {
 document.querySelector("#nextBtn").addEventListener("click", () => {
   state.index = (state.index + 1) % questions.length;
   render();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeQuestionDrawer();
+  }
 });
 nodes.categoryFilter.addEventListener("change", (event) => {
   state.filter = event.target.value;

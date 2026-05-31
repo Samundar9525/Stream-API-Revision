@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Stream API Practice</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="topbar">
+      <div>
+        <p class="eyebrow">Employee dataset</p>
+        <h1>Stream API Practice</h1>
+      </div>
+      <div class="progress-tools">
+        <nav class="topnav" aria-label="Main navigation">
+          <a href="https://samundar9525.github.io/LLD-Revision/">Home</a>
+          <a href="Stream_API_Answer_Key_With_Code.pdf" target="_blank" rel="noreferrer">Answer Key</a>
+        </nav>
+        <button id="clearProgress" class="ghost-btn" type="button">Clear progress</button>
+        <div class="scoreboard" aria-label="Practice progress">
+          <span id="score">0</span>
+          <small>solved</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <aside class="question-list" aria-label="Question list">
+        <div class="rail-title">
+          <p class="eyebrow">Practice Bank</p>
+          <h2>Stream API drills</h2>
+        </div>
+        <div class="list-header">
+          <strong>Pick a question</strong>
+          <select id="categoryFilter" aria-label="Filter by category">
+            <option value="all">All</option>
+            <option value="basic">Basic</option>
+            <option value="filter">Filter</option>
+            <option value="grouping">Grouping</option>
+            <option value="sorting">Sorting</option>
+            <option value="collector">Collectors</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+        <div id="questionButtons" class="question-buttons"></div>
+      </aside>
+
+      <section class="workspace">
+        <section class="prompt-panel">
+          <div class="prompt-top">
+            <p id="questionMeta" class="eyebrow">Question 1</p>
+            <div class="nav-actions">
+              <button id="prevBtn" class="icon-btn" type="button" aria-label="Previous question" title="Previous">&lsaquo;</button>
+              <button id="nextBtn" class="icon-btn" type="button" aria-label="Next question" title="Next">&rsaquo;</button>
+            </div>
+          </div>
+          <h2 id="questionText"></h2>
+          <div class="expected-output">
+            <span>Target output</span>
+            <code id="expectedOutput"></code>
+          </div>
+        </section>
+
+        <section class="compiler-panel">
+          <textarea id="codeEditor" class="source-cache" spellcheck="false" aria-hidden="true" tabindex="-1"></textarea>
+          <div id="streamWarning" class="warning" hidden>Stream API is not used here. Use employees.stream() or employees.parallelStream().</div>
+
+          <article class="embedded-compiler">
+            <div class="compiler-frame-head">
+              <strong>Embedded Java compiler</strong>
+              <div class="compiler-tools">
+                <button id="resetCode" class="ghost-btn" type="button">Reset starter</button>
+                <a href="https://onecompiler.com/java" target="_blank" rel="noreferrer">Open full compiler</a>
+              </div>
+            </div>
+            <iframe
+              id="oneCompilerFrame"
+              class="compiler-frame"
+              title="Embedded Java Compiler"
+              src="https://onecompiler.com/embed/java?theme=dark&amp;hideLanguageSelection=true&amp;listenToEvents=true&amp;codeChangeEvent=true"
+              loading="lazy"
+              frameborder="0"></iframe>
+          </article>
+
+          <div class="actual-output">
+            <label for="compilerOutput">Compiler output</label>
+            <textarea id="compilerOutput" spellcheck="false" placeholder="The app will try to capture output automatically. If OneCompiler blocks access, paste the compiler output here."></textarea>
+            <div id="comparisonPanel" class="comparison-panel" hidden>
+              <div>
+                <span>Expected</span>
+                <code id="comparisonExpected"></code>
+              </div>
+              <div>
+                <span>Actual</span>
+                <code id="comparisonActual"></code>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="submitBtn" class="primary-btn" type="button">Run & submit</button>
+            <p id="resultMessage" aria-live="polite"></p>
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <div id="sparkles" class="sparkles" aria-hidden="true"></div>
+  <script src="script.js"></script>
+</body>
+</html>
